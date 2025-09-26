@@ -122,7 +122,7 @@ class CorporateBiodiversityEnv(gym.Env):
             "exploit_disturb_increase": 30,
             "exploit_biodiv_loss": 0.02,
             "restore_cost": 5.0,
-            "restore_effect": 0.2,
+            "restore_effect": 40,
             "restore_biodiv_gain": 0.01,
             "greenwash_cost": 2.0,
             "greenwash_benefit": 0.1,
@@ -133,6 +133,16 @@ class CorporateBiodiversityEnv(gym.Env):
         # RNG
         self.np_random = np.random.default_rng(seed)
         self.step_count = 0
+
+    def _get_mean_biodiversity(self):
+        if self.n_cells == 0:
+            return 0.0
+        return float(np.mean([getattr(c, "shannon_div_idx", 0.0) for c in self.list_cells]))
+
+    def _get_mean_disturbance(self):
+        if self.n_cells == 0:
+            return 0.0
+        return float(np.mean([getattr(c, "disturbance", 0.0) for c in self.list_cells]))
 
     def reset(self, *, seed: int = None, options: dict = None):
         # re-seed generator if seed provided
@@ -180,10 +190,10 @@ class CorporateBiodiversityEnv(gym.Env):
     def _get_obs_for_corp(self, corp_idx: int):
         corp = self.corporations[corp_idx]
         # the mean disturbance of the whole grid, reflect the overall anthropogenic disturbance
-        mean_dist = float(np.mean([getattr(c, "disturbance", 0.0) for c in self.list_cells])) if self.n_cells > 0 else 0.0
+        mean_dist = self._get_mean_disturbance()
         # the mean number of individuals in the whole grid, reflect the overall biodiversity
-        mean_n_ind = float(np.mean([getattr(c, "n_individuals", 0.0) for c in self.list_cells])) if self.n_cells > 0 else 0.0
-        obs = np.array([corp.capital, corp.biodiversity_score, corp.resilience, mean_dist, mean_n_ind], dtype=np.float32)
+        mean_bio_div = self._get_mean_biodiversity()
+        obs = np.array([corp.capital, corp.biodiversity_score, corp.resilience, mean_dist, mean_bio_div], dtype=np.float32)
         return obs
 
     ### TODO: 定义投资者观察到什么
