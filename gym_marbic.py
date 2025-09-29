@@ -119,7 +119,7 @@ class CorporateBiodiversityEnv(gym.Env):
         # parameters for ecological/economic rules (可调整)
         self.params = {
             "exploit_gain_rate": 1.0,
-            "exploit_disturb_increase": 30,
+            "exploit_disturb_increase": 15,
             "exploit_biodiv_loss": 0.02,
             "restore_cost": 5.0,
             "restore_effect": 40,

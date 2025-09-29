@@ -174,7 +174,7 @@ class CellClass:
 
     @property
     def available_space(self):
-        return self.carrying_capacity - self.n_individuals
+        return max(self.carrying_capacity - self.n_individuals, 0)
 
     @property
     def room_for_one(self):
