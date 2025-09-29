@@ -193,6 +193,8 @@ class SpeciesDynamic:
         # self.effect_of_K_exploitation = None
         # These three disturbance matrices are all in the range of [0,1]
         self.K_dist_cell = None
+        # Store baseline carrying capacity for each cell
+        self.baseline_carrying_capacity = np.array([cell.carrying_capacity for cell in list_cell])
         # The D, B disturbance matrices for each cell and species, shape = (grid_size, grid_size, n_species)
         self.D_dist_cell_sp = None
         self.B_dist_cell_sp = None
@@ -204,7 +206,7 @@ class SpeciesDynamic:
         self.B_disturbance_sensitivity = np.zeros(self.n_species) + np.random.random(self.n_species)
 
     def init_disturbance_generators(self, mode_D="exponential", mode_B="exponential", mode_K="exponential",
-                                    alpha=0.1, beta=0.05, gamma=0.02, k=1.0, f0=10.0):
+                                    alpha=0.1, beta=0.05, gamma=0.009758, k=1.0, f0=10.0):
         self.effect_of_D_exploitation = np.einsum('ij,k->ijk', self.disturbance_matrix, self.D_disturbance_sensitivity)
         self.D_disturbance_generator = Disturbance(self.effect_of_D_exploitation, alpha=alpha, beta=beta, gamma=gamma,
                                        k=k, f0=f0, D_mode=mode_D, B_mode=mode_B, K_mode=mode_K)
@@ -228,20 +230,33 @@ class SpeciesDynamic:
         self.effect_of_B_exploitation = np.einsum('ij,k->ijk', self.disturbance_matrix, self.B_disturbance_sensitivity)
         self.B_disturbance_generator.f = self.effect_of_B_exploitation
 
+    def update_K_disturbance_generator(self):
+        # update the K disturbance generator with current disturbance_matrix
+        self.K_disturbance_generator.f = self.disturbance_matrix
+
     def update_K_dist_cell(self):
         self.K_dist_cell = self.K_disturbance_generator.transform_to_K_disturbance()
 
     def update_D_dist_cell_sp(self):
         self.D_dist_cell_sp = self.D_disturbance_generator.transform_to_D_disturbance()
-
+        #soft max normalization along species axis
+        # exp_D = np.exp(self.D_dist_cell_sp)
+        # self.D_dist_cell_sp = exp_D / np.sum(exp_D, axis=2, keepdims=True)
+        # clip to [0,1]
+        self.D_dist_cell_sp = np.clip(self.D_dist_cell_sp, 0.0, 1.0)
     def update_B_dist_cell_sp(self):
         self.B_dist_cell_sp = self.B_disturbance_generator.transform_to_B_disturbance()
-
+        self.B_dist_cell_sp = np.clip(self.B_dist_cell_sp, 0.0, 1.0)
     def update_cell_carrying_capacity(self):
+        # 确保K_dist_cell已更新
+        if self.K_dist_cell is None:
+            self.update_K_dist_cell()
+        
         for i, cell in enumerate(self.list_cell):
             x = i // self.grid_size
             y = i % self.grid_size
-            cell.carrying_capacity = int(self.K_dist_cell[x, y] * cell.carrying_capacity)
+            # 使用基准carrying capacity而不是当前值，避免复合增长
+            cell.carrying_capacity = int(self.K_dist_cell[x, y] * self.baseline_carrying_capacity[i])
             ### after updating carrying capacity, some places may have n_individuals > carrying_capacity, need to adjust
             # how to adjust? randomly kill individuals until n_individuals <= carrying_capacity
             if cell.n_individuals > cell.carrying_capacity:
@@ -277,6 +292,7 @@ class SpeciesDynamic:
         """
         self.update_D_disturbance_generator()
         self.update_B_disturbance_generator()
+        self.update_K_disturbance_generator()
         self.update_D_dist_cell_sp()
         self.update_B_dist_cell_sp()
         self.update_K_dist_cell()

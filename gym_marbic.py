@@ -122,7 +122,7 @@ class CorporateBiodiversityEnv(gym.Env):
             "exploit_disturb_increase": 15,
             "exploit_biodiv_loss": 0.02,
             "restore_cost": 5.0,
-            "restore_effect": 40,
+            "restore_effect": 5,
             "restore_biodiv_gain": 0.01,
             "greenwash_cost": 2.0,
             "greenwash_benefit": 0.1,

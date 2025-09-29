@@ -52,8 +52,8 @@ class Corporation:
         self.capital = max(0.0, self.capital - cost)
         
         ### TODO: 修改减少disturbance的方式
-        cell.disturbance = max(0.0, getattr(cell, "disturbance", 0.0) - restore_amount)
-        # cell.disturbance = getattr(cell, "disturbance", 0.0) - restore_amount
+        # cell.disturbance = max(0.0, getattr(cell, "disturbance", 0.0) - restore_amount)
+        cell.disturbance = getattr(cell, "disturbance", 0.0) - restore_amount
         ### TODO: 思考如何影响选中cell的biodiversity和species histogram
         self.biodiversity_score += biodiv_gain
         return {"cost": cost, "new_disturbance": cell.disturbance, "biodiv_gain": biodiv_gain}
