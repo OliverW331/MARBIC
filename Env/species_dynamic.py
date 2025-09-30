@@ -9,10 +9,10 @@ Simulate the dynamic of species population
         - K disturbance: decrease the carrying capacity for each cell
     - disturbance has the range of [0,1]
     - caused by random factor
-出生扩散死亡代码实现的过程
-    -循环每个cell（顺序随机），对每个cell里面的每个物种进行出生作为births，里面记录了每个出生的物种，总长度为出生量
-    -将births打乱顺序，依次处理每个出生的物种，根据扩散概率选择一个cell进行扩散，如果该cell有空间就放进去，否则继续选择下一个cell，直到放进去或者尝试了所有cell（一般不会到达这个程度，这样的话说明整个环境都没有空间了）
-    -循环完births应该就处理好了出生和扩散，然后再循环每个cell，对每个cell里面的每个物种进行死亡处理    
+Birth-dispersal-death code implementation process
+    -loop through eachcell（random order），对每个cell里面的每species进行出生作为births，里面记录了每个出生的species，total长度为出生量
+    -将births打乱顺序，依次处理每个出生的species，根据扩散概率selectonecell进行扩散，如果该cell有空between就放进去，否则继续select下onecell，直to放进去or者尝试了allcell（一般不会to达这个程度，这样的话说明整个environment都没有空between了）
+    -循环完births应该就处理好了出生and扩散，然后再loop through eachcell，对每个cell里面的每species进行死亡处理    
 '''
 
 from matplotlib.pylab import seed
@@ -75,7 +75,7 @@ def species_disperse(list_cells, births, disp_rate=1.0, seed=42):
         list_cells[selected_cell].sp_age_dict[species_id][0] += 1
         aval_space[selected_cell] = max(aval_space[selected_cell] - 1, 0)
         # print(f"[DEBUG] Birth {i}: species {species_id} dispersed to cell {selected_cell}, available_space now {aval_space[selected_cell]}")
-    # 结束后打印每个cell的总个体数
+    # 结束后打印每个cell的totalindividual数
     # for idx, cell in enumerate(list_cells):
     #     print(f"[DEBUG] Cell {idx}: n_individuals={cell.n_individuals}, carrying_capacity={cell.carrying_capacity}")
 
@@ -86,10 +86,10 @@ def species_death(list_cells, n_species, death_rate_matrix):
         # death_rates.shape = (n_cells,)
         for idx, cell in enumerate(list_cells):
             age_arr = cell.sp_age_dict[species_id]
-            # 按年龄段批量死亡
+            # 按age段批量死亡
             deaths_per_age = np.round(age_arr * death_rates[idx]).astype(int)
             age_arr[:] = np.maximum(0, age_arr - deaths_per_age)
-            # 同步 species_hist
+            # 同steps species_hist
             cell.species_hist[species_id] = age_arr.sum()
 
 ### helper functions for visualization
@@ -178,7 +178,7 @@ class SpeciesDynamic:
         self.disturbance_matrix = np.array([c.disturbance for c in list_cell]).reshape((self.grid_size, self.grid_size))
         # the sensitivity of each species to D and B disturbance, shape = (n_species,)
         # larger value means more sensitive
-        ### TODO: 没有包括K disturbance sensitivity，因为K disturbance是直接影响cell的carrying capacity
+        ### TODO: 没有包括K disturbance sensitivity，因为K disturbance是直接impactcell的carrying capacity
         self.D_disturbance_sensitivity = None
         self.B_disturbance_sensitivity = None
         self.K_disturbance_sensitivity = None
@@ -255,7 +255,7 @@ class SpeciesDynamic:
         for i, cell in enumerate(self.list_cell):
             x = i // self.grid_size
             y = i % self.grid_size
-            # 使用基准carrying capacity而不是当前值，避免复合增长
+            # usebase准carrying capacity而不是当前值，避免复合增长
             cell.carrying_capacity = int(self.K_dist_cell[x, y] * self.baseline_carrying_capacity[i])
             ### after updating carrying capacity, some places may have n_individuals > carrying_capacity, need to adjust
             # how to adjust? randomly kill individuals until n_individuals <= carrying_capacity
@@ -271,13 +271,13 @@ class SpeciesDynamic:
 
     def update_sp_age_dict(self):
         """
-        对所有 cell 的所有物种进行年龄增长和最大年龄死亡。
+        对all cell 的allspecies进行age增长and最大age死亡。
         """
         for cell in self.list_cell:
             for species_id, age_arr in cell.sp_age_dict.items():
-                # 更新 species_hist，减去最大年龄死亡的个体数
+                # 更新 species_hist，减去最大age死亡的individual数
                 cell.species_hist[species_id] -= age_arr[-1]
-                # 年龄增长：所有个体年龄+1，最大年龄的个体死亡
+                # age增长：allindividualage+1，最大age的individual死亡
                 age_arr[1:] = age_arr[:-1]
                 age_arr[0] = 0  # 新出生后再加
             cell.species_hist = np.array([arr.sum() for arr in cell.sp_age_dict.values()])

@@ -72,7 +72,7 @@ class Disturbance:
         Visually plot self.f vs D, B, K disturbance effects.
         """
         f_range = np.linspace(0, max_f, 200)
-        # 生成虚拟的f矩阵用于画图
+        # Generate virtualfmatrix for plotting
         D = (1 - np.exp(-self.alpha * f_range)) if self.D_mode == "exponential" else 1 / (1 + np.exp(-self.k * (f_range - self.f0)))
         B = (1 / (1 + self.beta * f_range)) if self.B_mode == "exponential" else 1 - (1 / (1 + np.exp(-self.k * (f_range - self.f0))))
         K = (np.exp(-self.gamma * f_range)) if self.K_mode == "exponential" else 1 - (1 / (1 + np.exp(-self.k * (f_range - self.f0))))

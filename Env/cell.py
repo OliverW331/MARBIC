@@ -88,14 +88,14 @@ def get_all_to_all_dist(n_cells):
     y = np.tile(np.arange(n_cells), n_cells)
     coords = np.column_stack((x, y))  # shape = (n_cells^2, 2)
 
-    # 计算 pairwise 距离矩阵
+    # Calculate pairwise distance matrix
     diff = coords[:, None, :] - coords[None, :, :]
     dist_matrix = np.sqrt(np.sum(diff**2, axis=-1))
     return dist_matrix
 
 def get_coordinates(n_cells):
     """
-    返回所有 cell 的 (id, x, y) 坐标数组
+    Return all cell  (id, x, y) coordinate array
     return coords in the format of (id, x, y)
     """
     ids = np.arange(n_cells * n_cells)
@@ -196,7 +196,7 @@ class CellClass:
 
 
 # -------------------------------------------------
-# 初始化函数
+# initialization functions
 # -------------------------------------------------
 def init_cell_objects(cell_id_n_coord, 
                       d_matrix, 
@@ -248,7 +248,7 @@ def init_propagate_species(
     n_individuals_per_cell_sp_i = np.zeros(len(list_cells))
 
     while True:
-        # 选择当前分配的 cell
+        # selectcurrentallocation cell
         for cell_id in curr_ind:
             aval_space[n_individuals_per_cell == cell_carrying_capacity] = 0
             c = list_cells[cell_id]
@@ -257,14 +257,14 @@ def init_propagate_species(
             disp_vec = disp_probability.flatten()
             sampling_prob = disp_vec * aval_space
 
-            # 如果没有可分配空间，跳过
+            # 如果没有canallocation空between，跳过
             if np.sum(sampling_prob) == 0:
                 continue
 
             selected_cell = rng.choice(
                 cell_id_n_coord[:, 0], p=sampling_prob / np.sum(sampling_prob)
             )
-            # 分配个体
+            # allocationindividual
             # update species histogram in selected cell
             # each iteration is dealing with only one species
             list_cells[selected_cell].species_hist[species_id] += 1
@@ -330,7 +330,7 @@ def init_species_population(
         start_cell = rng.choice(cell_id_n_coord[:, 0], p=aval_space/np.sum(aval_space))
         #start propogating the species from the start_cell
         curr_ind = [start_cell]
-        #更新n_individuals_per_cell和n_individuals_added
+        #更新n_individuals_per_cellandn_individuals_added
         n_individuals_per_cell, n_individuals_added = init_propagate_species(
                                                                 curr_ind,
                                                                 max_n_ind,
@@ -377,7 +377,7 @@ def plot_species_distribution(list_cells, grid_size, species_id, title_prefix=""
 
 def plot_disturbance_map(list_cells):
     """
-    绘制 disturbance 热图
+    plot disturbance heatmap
     """
     disturbance = [c.disturbance for c in list_cells]
     grid_size = int(np.sqrt(len(list_cells)))
@@ -392,7 +392,7 @@ def plot_disturbance_map(list_cells):
 
 def plot_species_abundance_hist(list_cells):
     """
-    绘制每个物种的总个体数直方图，检查是否符合 Weibull 分布
+    plot每speciestotalindividual数直方图，检查是否符合 Weibull 分布
     """
     n_species = len(list_cells[0].species_hist)
     total_abundance = np.zeros(n_species)
@@ -408,7 +408,7 @@ def plot_species_abundance_hist(list_cells):
 
 def plot_biodiversity_map(list_cells):
     """
-    绘制物种多样性热图
+    plotspeciesdiversityheatmap
     """
     species_diversity = [c.shannon_div_idx for c in list_cells]
     grid_size = int(np.sqrt(len(list_cells)))
@@ -423,7 +423,7 @@ def plot_biodiversity_map(list_cells):
 
 def plot_n_species_map(list_cells):
     """
-    绘制物种数量热图
+    plotspeciesquantityheatmap
     """
     n_species = [c.n_species for c in list_cells]
     grid_size = int(np.sqrt(len(list_cells)))

@@ -21,11 +21,11 @@ INV_INVEST = 1
 class CorporateBiodiversityEnv(gym.Env):
     """
     Multi-agent environment for corporations and investors.
-    - 使用 dict 接口： reset() -> obs_dict
+    - Uses dict interface: reset() -> obs_dict
                           step(actions_dict) -> obs_dict, reward_dict, done_dict, info_dict
-    - actions_dict 的 key 为 agent_id，例如 'corp_0' / 'inv_0'，value 为 action dict 与对应 action space。
+    - actions_dict key is agent_id, e.g. 'corp_0' / 'inv_0', value is action dict corresponding to action space.
 
-    TODO: 需要思考是通过disturbance影响cell的关于biodiversity的属性，还是直接影响cell的biodiversity属性？？
+    TODO: Need to consider whether to affect cell's biodiversity attributes through disturbance, or directly affect cell's biodiversity attributes??
 
     """
 
@@ -86,8 +86,8 @@ class CorporateBiodiversityEnv(gym.Env):
         # corp action: (action_type in [0..4], cell_index in [0..n_cells-1])
         # action_type: 0 - no action, 1 - exploit, 2 - restore, 3 - green wash, 4 - invest in resilience
         # cell_index: 0 to n_cells-1, which cell to act on, only one cell at a time
-        ### TODO: 考虑每个公司可以选几个cell来exploit/restore， 目前只允许选择一个cell
-        ### 考虑修改 action_space 和 step 函数以支持多个 cell
+        ### TODO: Consider how many cells each corporation can select for exploit/restore, currently only allows selecting one cell
+        ### Consider modifying action_space and step function to support multiple cells
         corp_action_space = spaces.Dict({
             "action_type": spaces.Discrete(5),
             "cell": spaces.Discrete(self.n_cells)
@@ -99,12 +99,12 @@ class CorporateBiodiversityEnv(gym.Env):
         })
 
         # observation shapes:
-        ### TODO: 定义公司的观察空间：能不能观察到别的公司的状况，
-        ### 要不要观察到所有cell的状况还是每个公司只能观察到一定格子范围内的biodiversity和disturbance
-        ### 目前只能观察到所有格子的平均disturbance和平均n_individuals
+        ### TODO: Define corporate observation space: can they observe other corporations' conditions,
+        ### whether to observe all cell conditions or each corporation can only observe biodiversity and disturbance within a certain grid range
+        ### Currently can only observe average disturbance and average n_individuals of all grids
         # corp obs: [capital, biodiv_score, resilience, mean_disturbance, mean_n_individuals]
         corp_obs_space = spaces.Box(low=-np.inf, high=np.inf, shape=(5,), dtype=np.float32)
-        ### TODO: 定义投资者的观察空间
+        ### TODO: Define investor observation space
         # investor obs: [cash] + portfolio(Nc) + corp_capitals(Nc) + corp_biodiv(Nc)
         inv_obs_space = spaces.Box(low=-np.inf, high=np.inf, shape=(1 + self.n_corporations * 2 + self.n_corporations,), dtype=np.float32)
         # note: the shape above is 1 + Nc + Nc + Nc = 1 + 3*Nc; adjust if you change content.
@@ -116,7 +116,7 @@ class CorporateBiodiversityEnv(gym.Env):
             self.action_spaces[aid] = inv_action_space
             self.observation_spaces[aid] = inv_obs_space
 
-        # parameters for ecological/economic rules (可调整)
+        # parameters for ecological/economic rules (adjustable)
         self.params = {
             "exploit_gain_rate": 1.0,
             "exploit_disturb_increase": 15,
@@ -180,12 +180,12 @@ class CorporateBiodiversityEnv(gym.Env):
             corp.reset()
         for inv in self.investors:
             inv.reset()
-        # optionally reset cells' disturbances (这里假设 list_cell 已经是初始状态）
-        # 如果希望重置 cell 的某些字段，可在这里操作
+        # optionally reset cells' disturbances (Assume here list_cell already in initial state）
+        # If you want to reset cell  some fields，can operate here
         return self._get_obs_dict()
     
 
-    ### TODO: 定义公司观察到什么
+    ### TODO: define what corporations observe
     # the following function is used to get the observation for a specific corporation
     def _get_obs_for_corp(self, corp_idx: int):
         corp = self.corporations[corp_idx]
@@ -196,7 +196,7 @@ class CorporateBiodiversityEnv(gym.Env):
         obs = np.array([corp.capital, corp.biodiversity_score, corp.resilience, mean_dist, mean_bio_div], dtype=np.float32)
         return obs
 
-    ### TODO: 定义投资者观察到什么
+    ### TODO: define what investors observe
     def _get_obs_for_inv(self, inv_idx: int):
         inv = self.investors[inv_idx]
         corp_capitals = np.array([c.capital for c in self.corporations], dtype=np.float32)
@@ -205,7 +205,7 @@ class CorporateBiodiversityEnv(gym.Env):
         obs = np.concatenate([[inv.cash], inv.portfolio.astype(np.float32), corp_capitals, corp_biodiv]).astype(np.float32)
         return obs
 
-    ### TODO: 整合总结corp和inv的观察到obs，形成全局观察空间
+    ### TODO: integrate and summarizecorpandinv观察toobs，form global observation space
     def _get_obs_dict(self):
         obs = {}
         # "i" is the index, "aid" is the agent id string
@@ -220,7 +220,7 @@ class CorporateBiodiversityEnv(gym.Env):
         actions: dict keyed by agent_id, each value matches agent's action_space.
         - each action is decided by the agent's policy (for demo, here is sampled randomly)
         - actions are applied in the order of agent IDs
-        返回: obs_dict, reward_dict, done_dict, info_dict
+        return: obs_dict, reward_dict, done_dict, info_dict
         """
         self.step_count += 1
         #------------------- Get the previous states (for rewards) ------------------- 
@@ -234,11 +234,11 @@ class CorporateBiodiversityEnv(gym.Env):
         ### TODO: how to calculate the Portfolio Value needs to be decided here and in reward
         #the previous portfolio value of each investor
         for inv in self.investors:
-            # 计算投资组合价值
+            # Calculateportfolio value
             portfolio_value = sum(inv.portfolio[i] * self.corporations[i].capital for i in range(self.n_corporations))
             prev_states["investors"].append(portfolio_value)
         #------------------- Make the actions ------------------- 
-        # --- 1) 执行 corporations 的动作 ---
+        # --- 1) execute corporations action ---
         for i, aid in enumerate(self.corp_ids):
             act = actions.get(aid, None)
             corp = self.corporations[i]
@@ -246,7 +246,7 @@ class CorporateBiodiversityEnv(gym.Env):
                 continue
             action_type = int(act.get("action_type", NO_ACTION))
             #choose target cell index, default to 0 if not provided, only one cell each exploitation
-            # 目前只支持选择一个cell进行操作，后续可以考虑支持多个cell
+            # currently only supportsselectonecellperform operations，后续can以考虑support多个cell
             target_cell_idx = int(act.get("cell", 0)) if "cell" in act else 0
             # ensure target_cell_idx is within valid range 【0, n_cells-1】
             target_cell_idx = max(0, min(self.n_cells - 1, target_cell_idx)) if self.n_cells > 0 else None
@@ -270,10 +270,10 @@ class CorporateBiodiversityEnv(gym.Env):
             elif action_type == RESILIENCE:
                 corp.invest_resilience(cost=self.params["resilience_cost"], resilience_gain=self.params["resilience_gain"])
             else:
-                # 未知 action -> 忽略
+                # unknown action -> ignore
                 pass
 
-        # --- 2) 执行 investors 的动作 ---
+        # --- 2) execute investors action ---
         for i, aid in enumerate(self.inv_ids):
             act = actions.get(aid, None)
             inv = self.investors[i]
@@ -295,20 +295,20 @@ class CorporateBiodiversityEnv(gym.Env):
         self.sdyn.update_disturbance_matrix(self.list_cells)
         self.sdyn.perform_species_dynamics(birth_first=self.birth_first,
                                            disp_rate=self.disp_rate)
-        # ------------------- 计算观测、占位 reward、done、info -------------------
+        # ------------------- Calculateobservation、placeholder reward、done、info -------------------
         obs = self._get_obs_dict()
-        ### TODO： 思考如何定义reward function
+        ### TODO： think about how to definereward function
         reward_result = compute_all_rewards(self.corporations, self.investors, prev_states, self.list_cells)
         rewards = {}
         for i, aid in enumerate(self.corp_ids):
             rewards[aid] = reward_result["corporations"][i]
         for i, aid in enumerate(self.inv_ids):
             rewards[aid] = reward_result["investors"][i]
-        ### TODO: 思考每个agent什么时候到end state
+        ### TODO: think about eachagent什么时候toend state
         # done_flag: check if the agent has reached the end state
         done_flag = self.step_count >= self.max_steps
         dones = {aid: done_flag for aid in self.agent_ids}
-        ### TODO: 思考如何定义每个agent的info
+        ### TODO: think about how to define eachagentinfo
         # infos can be empty dicts for now
         infos = {aid: {} for aid in self.agent_ids}
 
@@ -318,7 +318,7 @@ class CorporateBiodiversityEnv(gym.Env):
         return obs, rewards, dones, infos
 
     def render(self, mode="human"):
-        # 简单文本渲染展示几个 summary 信息
+        # simple textThisrender and display several summary information
         print(f"Step {self.step_count}/{self.max_steps}")
         for i, corp in enumerate(self.corporations):
             print(f"Corp {i}: capital={corp.capital:.2f}, biodiv={corp.biodiversity_score:.3f}, resilience={corp.resilience:.3f}")
@@ -332,9 +332,9 @@ class CorporateBiodiversityEnv(gym.Env):
         pass
 
 
-# minimal usage example (当作脚本运行时)
+# minimal usage example (as scriptThisruntime)
 # if __name__ == "__main__":
-#     # 需要先定义一个非常简单的 CellClass 用于 demo
+#     # 需要先定义one非常Simple CellClass used for demo
 #     grid_size = 100
 #     n_species = 25
 #     carrying_capacity = 25
@@ -355,7 +355,7 @@ class CorporateBiodiversityEnv(gym.Env):
 #     env = CorporateBiodiversityEnv(list_cell=list_cells, n_corporations=3, n_investors=2, max_steps=10)
 #     obs = env.reset()
 #     for t in range(5):
-#         # 随机采样 actions
+#         # random采样 actions
 #         actions = {}
 #         for aid in env.agent_ids:
 #             actions[aid] = env.action_spaces[aid].sample()
