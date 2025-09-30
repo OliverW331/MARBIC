@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 sys.path.append('/Users/muchenwang/Documents/GitHub/MARBIC')
 
 from gym_marbic import CorporateBiodiversityEnv
-from species_visualization import *
+from analysis.species_visualization import *
 
 def demo_species_visualization():
     """Demonstrate species visualization functionality"""

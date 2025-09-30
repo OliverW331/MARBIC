@@ -31,12 +31,18 @@ MARBIC/
 ├── Disturbance/                    # Disturbance modeling
 │   ├── disturbance.py             # Disturbance generation
 │   └── disturbance_demo.ipynb     # Disturbance examples
-├── gym_marbic.py                   # Main Gym environment
-├── species_visualization.py        # Species analysis tools
-├── ecosystem_impact_analysis.py    # Ecosystem impact analyzer
-├── demo_*.py                       # Demonstration scripts
-├── *.ipynb                         # Jupyter notebooks
-└── *_GUIDE.md                      # User guides
+├── analysis/                       # Analysis tools and notebooks
+│   ├── ecosystem_impact_analysis.py    # Ecosystem impact analyzer
+│   ├── species_visualization.py        # Species analysis tools
+│   ├── ecosystem_impact_showcase.ipynb # Ecosystem analysis examples
+│   └── sensitivity_analysis.ipynb      # Parameter sensitivity studies
+├── demo/                           # Demonstration scripts and examples
+│   ├── demo_species_visualization.py   # Species visualization examples
+│   └── demo_cell.ipynb                 # Basic cell interactions demo
+├── docs/                           # Documentation and user guides
+│   ├── ECOSYSTEM_ANALYSIS_GUIDE.md     # Ecosystem analysis guide
+│   └── SPECIES_VISUALIZATION_GUIDE.md  # Species visualization guide
+└── gym_marbic.py                   # Main Gym environment
 ```
 
 ## 🚀 Quick Start
@@ -116,7 +122,7 @@ The environment supports multiple types of agents:
 ### Species Visualization
 
 ```python
-from species_visualization import *
+from analysis.species_visualization import *
 
 # Analyze species characteristics
 plot_species_disturbance_sensitivity(env.sdyn)
@@ -130,7 +136,7 @@ report = create_species_summary_report(env.sdyn, env.list_cells)
 ### Ecosystem Impact Analysis
 
 ```python
-from ecosystem_impact_analysis import EcosystemAnalyzer
+from analysis.ecosystem_impact_analysis import EcosystemAnalyzer
 
 # Create analyzer
 analyzer = EcosystemAnalyzer()
@@ -205,17 +211,17 @@ env = CorporateBiodiversityEnv(
 
 ## 📚 Documentation
 
-- [`SPECIES_VISUALIZATION_GUIDE.md`](SPECIES_VISUALIZATION_GUIDE.md) - Species analysis tools
-- [`ECOSYSTEM_ANALYSIS_GUIDE.md`](ECOSYSTEM_ANALYSIS_GUIDE.md) - Ecosystem impact analysis
-- [`demo_*.py`](.) - Example scripts and demonstrations
-- [`*.ipynb`](.) - Interactive Jupyter notebooks
+- [`docs/SPECIES_VISUALIZATION_GUIDE.md`](docs/SPECIES_VISUALIZATION_GUIDE.md) - Species analysis tools
+- [`docs/ECOSYSTEM_ANALYSIS_GUIDE.md`](docs/ECOSYSTEM_ANALYSIS_GUIDE.md) - Ecosystem impact analysis
+- [`demo/`](demo/) - Example scripts and demonstrations
+- [`analysis/`](analysis/) - Analysis tools and interactive notebooks
 
 ## 🧪 Example Notebooks
 
-- `demo_cell.ipynb` - Basic cell and species interactions
-- `ecosystem_impact_showcase.ipynb` - Comprehensive ecosystem analysis
-- `sensitivity_analysis.ipynb` - Parameter sensitivity studies
-- `disturbance_demo.ipynb` - Disturbance modeling examples
+- [`demo/demo_cell.ipynb`](demo/demo_cell.ipynb) - Basic cell and species interactions
+- [`analysis/ecosystem_impact_showcase.ipynb`](analysis/ecosystem_impact_showcase.ipynb) - Comprehensive ecosystem analysis
+- [`analysis/sensitivity_analysis.ipynb`](analysis/sensitivity_analysis.ipynb) - Parameter sensitivity studies
+- [`Disturbance/disturbance_demo.ipynb`](Disturbance/disturbance_demo.ipynb) - Disturbance modeling examples
 
 ## 🤝 Contributing
 

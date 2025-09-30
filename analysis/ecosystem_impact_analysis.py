@@ -25,7 +25,7 @@ from typing import Dict, List, Any, Tuple
 sys.path.append('/Users/muchenwang/Documents/GitHub/MARBIC')
 
 from gym_marbic import CorporateBiodiversityEnv
-from species_visualization import *
+from analysis.species_visualization import *
 
 class EcosystemAnalyzer:
     """Ecosystem analyzer class"""
