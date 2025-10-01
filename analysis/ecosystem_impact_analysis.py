@@ -8,6 +8,7 @@ on various ecosystem grid map indicators, including:
 - Carrying capacity  
 - Number of individuals
 - Number of species
+- blahblah
 
 And records and visualizes the historical changes of these indicators during simulation.
 """
