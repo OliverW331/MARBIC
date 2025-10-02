@@ -1,0 +1,35 @@
+Ecosystem Impact Analysis Report
+==================================================
+
+Parameter Settings:
+  grid_size: 50
+  n_species: 10
+  carrying_capacity: 25
+  disturbance: 0.0
+  min_age: 8
+  max_age: 10
+  max_age_sort: False
+  lat_steep: 0.1
+  disp_rate: 0.45
+  n_corporations: 3
+  n_investors: 2
+  max_steps: 1000000
+  half: True
+  birth_first: True
+  seed: 42
+  Simulation steps: 1000
+
+Scenario Ranking:
+  4. Greenwash: 0.932
+  3. Restore: 0.665
+  1. Nothing: 0.635
+  5. Random: 0.422
+  2. Exploit: 0.000
+
+Detailed Data:
+ Scenario  Shannon_Change  Capacity_Change  Individuals_Change  Species_Change  Disturbance_Change  Final_Corp_Capital  Final_Corp_Biodiv  Steps_Completed  Comprehensive_Score
+  Nothing           0.430            0.000           31250.000           1.192               0.000             100.000              1.000             1000                0.635
+  Exploit          -0.532           -4.169           20639.000          -1.106              18.000           22866.000              0.000             1000                0.000
+  Restore           0.267            1.240           34349.000           0.616              -6.000               0.000             11.000             1000                0.665
+Greenwash           0.430            0.000           31250.000           1.192               0.000               0.000            101.000             1000                0.932
+   Random          -0.248           -0.745           29339.000          -0.249               2.624            3282.333             38.366             1000                0.422
